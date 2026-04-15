@@ -147,3 +147,11 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+# machine-learning-client dev/testing scripts and dataset
+machine-learning-client/test_image.py
+machine-learning-client/sweep_threshold.py
+machine-learning-client/test_photos/
+machine-learning-client/result.jpg
+machine-learning-client/hand_landmarker.task
+machine-learning-client/tester_app.py

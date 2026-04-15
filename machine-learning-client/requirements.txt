@@ -1,0 +1,7 @@
+opencv-python-headless
+mediapipe
+pymongo
+pytest
+pytest-cov
+pylint
+black
