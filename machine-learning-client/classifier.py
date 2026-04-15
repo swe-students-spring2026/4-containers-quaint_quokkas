@@ -14,7 +14,7 @@ FINGER_LANDMARKS = {
     "pinky": (17, 18, 19, 20),
 }
 
-# Per-finger straightness thresholds, tuned via sweep_threshold.py.
+# Per-finger straightness thresholds
 STRAIGHTNESS_THRESHOLDS = {
     "index": 0.96,
     "middle": 0.94,
