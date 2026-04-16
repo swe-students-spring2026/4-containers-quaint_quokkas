@@ -51,12 +51,14 @@ def get_stats():
     raw = list(results_collection.aggregate(pipeline))
     stats = {item["_id"]: item["count"] for item in raw}
     total = sum(stats.values())
-    return jsonify({
-        "rock": stats.get("rock", 0),
-        "paper": stats.get("paper", 0),
-        "scissors": stats.get("scissors", 0),
-        "total": total,
-    })
+    return jsonify(
+        {
+            "rock": stats.get("rock", 0),
+            "paper": stats.get("paper", 0),
+            "scissors": stats.get("scissors", 0),
+            "total": total,
+        }
+    )
 
 
 @app.route("/api/latest")
