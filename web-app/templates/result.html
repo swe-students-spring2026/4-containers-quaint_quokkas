@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quaint Quokkas</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+</head>
+
+<body>
+  <div class="result-container">
+    {% if error %}
+      <h1>⚠️ Error</h1>
+      <p>{{ error }}</p>
+    {% else %}
+      <h1>Game Result</h1>
+      
+      <div class="moves">
+        <div class="move">
+          <h2>Your Move</h2>
+          <p>{{ player_move | upper }}</p>
+        </div>
+        
+        <div class="vs">VS</div>
+        
+        <div class="move">
+          <h2>Computer Move</h2>
+          <p>{{ computer_move | upper }}</p>
+        </div>
+      </div>
+      
+      <h2 class="result-{{ winner }}">
+        {% if winner == "player" %}
+          🎉 YOU WIN! 🎉
+        {% elif winner == "computer" %}
+          💻 COMPUTER WINS
+        {% else %}
+          🤝 TIE
+        {% endif %}
+      </h2>
+    {% endif %}
+    
+    <form action="/" method="GET">
+      <button type="submit">Play Again</button>
+    </form>
+  </div>
+</body>
+</html>
