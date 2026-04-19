@@ -148,7 +148,7 @@ def test_get_session_found(mock_coll, client):
     assert resp.status_code == 200
     assert resp.get_json()["fillers_total"] == 2
 
-    @patch("app.users_collection")
+@patch("app.users_collection")
 def test_register_get(mock_users, client):
     """Register page loads."""
     resp = client.get("/register")
