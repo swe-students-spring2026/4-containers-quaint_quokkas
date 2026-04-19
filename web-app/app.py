@@ -83,7 +83,7 @@ def register():
     return render_template("register.html")
 
 
-@app.route("/")
+@app.route("/", methods=["GET", "POST"])
 @app.route("/login", methods=["GET", "POST"])
 def login():
 
@@ -207,8 +207,8 @@ def analyze():
         upsert=True,
     )
 
+    result.pop("user_id", None)
     return jsonify(result)
-
 
 @app.route("/api/sessions", methods=["GET"])
 @login_required
