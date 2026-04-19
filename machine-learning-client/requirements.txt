@@ -5,3 +5,6 @@ pytest
 pytest-cov
 pylint
 black
+openai-whisper
+coverage
+moviepy
