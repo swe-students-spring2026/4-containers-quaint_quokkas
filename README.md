@@ -41,6 +41,8 @@ Presently is a Flask web app designed to help you improve your speaking and pres
    docker-compose up --build
 ```
 
+Note: It can take up to 10 minutes for all containers to build.
+
 4. Access the application **(Please use Chrome instead of Safari or any other browser)**:
    - Web app: http://localhost:3000
    - ML client API: http://localhost:8000
