@@ -19,7 +19,7 @@ def test_extract_audio(mock_clip):
 
 @patch("transcribe.os.remove")
 @patch("transcribe.os.path.exists", return_value=True)
-@patch("transcribe.whisper.load_model")
+@patch("whisper.load_model")
 @patch("transcribe.extract_audio", return_value="temp_audio.wav")
 def test_transcribe_video(mock_extract, mock_load, _mock_exists, mock_remove):
     """transcribe_video returns the model's text and cleans up the temp file."""
