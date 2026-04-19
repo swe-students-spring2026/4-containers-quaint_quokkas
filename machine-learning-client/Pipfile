@@ -9,6 +9,7 @@ mediapipe = "*"
 openai-whisper = "*"
 moviepy = "*"
 pymongo = "*"
+numpy = "*"
 
 [dev-packages]
 pylint = "*"
