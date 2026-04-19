@@ -4,10 +4,11 @@
 
 import io
 from unittest.mock import patch, MagicMock
+from werkzeug.security import generate_password_hash
 import pytest
 import requests as req_lib
 import app as webapp
-from werkzeug.security import generate_password_hash
+
 
 
 @pytest.fixture
@@ -149,7 +150,7 @@ def test_get_session_found(mock_coll, client):
     assert resp.get_json()["fillers_total"] == 2
 
 @patch("app.users_collection")
-def test_register_get(mock_users, client):
+def test_register_get(_mock_users, client):
     """Register page loads."""
     resp = client.get("/register")
     assert resp.status_code == 200
@@ -157,7 +158,7 @@ def test_register_get(mock_users, client):
 
 @patch("app.login_user")
 @patch("app.users_collection")
-def test_register_post(mock_users, mock_login, client):
+def test_register_post(mock_users, _mock_login, client):
     """Successful registration redirects to dashboard."""
     mock_users.find_one.return_value = None
     mock_users.insert_one.return_value = MagicMock(inserted_id="abc123")
@@ -176,7 +177,7 @@ def test_register_duplicate(mock_users, client):
 
 @patch("app.login_user")
 @patch("app.users_collection")
-def test_login_success(mock_users, mock_login, client):
+def test_login_success(mock_users, _mock_login, client):
     """Valid login redirects to dashboard."""
     mock_users.find_one.return_value = {
         "_id": "507f1f77bcf86cd799439011",
