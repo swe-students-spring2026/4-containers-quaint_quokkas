@@ -90,8 +90,8 @@ def analyze():
         "created_at": datetime.now().isoformat(),
         "duration_seconds": duration_seconds,
         "transcript": speech.get("transcript", ""),
-        "word_count": speech.get("word_count", 0),
-        "wpm_overall": speech.get("wpm", 0),
+        "word_count": speech.get("total_words", 0),
+        "wpm_overall": round(speech.get("total_words", 0) / (duration_seconds / 60), 1) if duration_seconds > 0 else 0,
         "fillers": {
             "total": total_fillers,
             "per_minute": fillers_per_minute,

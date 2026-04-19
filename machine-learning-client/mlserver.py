@@ -1,6 +1,7 @@
 import os
 import tempfile
 from flask import Flask, request, jsonify
+from moviepy import VideoFileClip
 from analyze_speech import analyze_speech
 from analyze_video import analyze_vision
 
@@ -20,7 +21,11 @@ def analyze():
     tmp.close()
 
     try:
+        clip = VideoFileClip(tmp.name)
+        duration = clip.duration
+        clip.close()
         speech_result = analyze_speech(tmp.name)
+        speech_result["duration_seconds"] = round(duration, 1)
         vision_result = analyze_vision(tmp.name)
         return jsonify({"speech": speech_result, "vision": vision_result})
     except Exception as exc:  # pylint: disable=broad-except
