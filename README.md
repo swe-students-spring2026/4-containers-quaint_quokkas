@@ -28,7 +28,7 @@ Presently is a Flask web app designed to help you improve your speaking and pres
 1. Clone the repository:
 ```bash
    git clone https://github.com/swe-students-spring2026/4-containers-quaint_quokkas.git
-   cd YOUR_REPO
+   cd 4-containers-quaint_quokkas
 ```
 
 2. Create your environment file:
