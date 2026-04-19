@@ -4,6 +4,7 @@
 
 import io
 from unittest.mock import patch, MagicMock
+from werkzeug.security import generate_password_hash
 import pytest
 import requests as req_lib
 import app as webapp
@@ -13,6 +14,7 @@ import app as webapp
 def client():
     """Create a test client."""
     webapp.app.config["TESTING"] = True
+    webapp.app.config["LOGIN_DISABLED"] = True
     return webapp.app.test_client()
 
 
@@ -40,6 +42,9 @@ def test_analyze_no_video(client):
     assert resp.status_code == 400
 
 
+@patch(
+    "app.current_user", MagicMock(id="507f1f77bcf86cd799439011", is_authenticated=True)
+)
 @patch("app.sessions_collection")
 @patch("app.requests.post")
 def test_analyze_success(mock_post, mock_coll, client):
@@ -86,6 +91,9 @@ def test_analyze_ml_error(mock_post, client):
     assert resp.status_code == 500
 
 
+@patch(
+    "app.current_user", MagicMock(id="507f1f77bcf86cd799439011", is_authenticated=True)
+)
 @patch("app.sessions_collection")
 def test_get_sessions(mock_coll, client):
     """Sessions API returns list."""
@@ -107,6 +115,9 @@ def test_get_sessions(mock_coll, client):
     assert resp.get_json()[0]["session_id"] == "a"
 
 
+@patch(
+    "app.current_user", MagicMock(id="507f1f77bcf86cd799439011", is_authenticated=True)
+)
 @patch("app.sessions_collection")
 def test_get_session_not_found(mock_coll, client):
     """Missing session returns 404."""
@@ -115,6 +126,9 @@ def test_get_session_not_found(mock_coll, client):
     assert resp.status_code == 404
 
 
+@patch(
+    "app.current_user", MagicMock(id="507f1f77bcf86cd799439011", is_authenticated=True)
+)
 @patch("app.sessions_collection")
 def test_get_session_found(mock_coll, client):
     """Existing session returns full data."""
@@ -133,3 +147,57 @@ def test_get_session_found(mock_coll, client):
     resp = client.get("/api/sessions/s1")
     assert resp.status_code == 200
     assert resp.get_json()["fillers_total"] == 2
+
+
+@patch("app.users_collection")
+def test_register_get(_mock_users, client):
+    """Register page loads."""
+    resp = client.get("/register")
+    assert resp.status_code == 200
+
+
+@patch("app.login_user")
+@patch("app.users_collection")
+def test_register_post(mock_users, _mock_login, client):
+    """Successful registration redirects to dashboard."""
+    mock_users.find_one.return_value = None
+    mock_users.insert_one.return_value = MagicMock(inserted_id="abc123")
+    resp = client.post("/register", data={"username": "newuser", "password": "pass123"})
+    assert resp.status_code == 302
+
+
+@patch("app.users_collection")
+def test_register_duplicate(mock_users, client):
+    """Duplicate username shows error."""
+    mock_users.find_one.return_value = {"username": "taken"}
+    resp = client.post("/register", data={"username": "taken", "password": "pass"})
+    assert resp.status_code == 200
+    assert b"already exists" in resp.data
+
+
+@patch("app.login_user")
+@patch("app.users_collection")
+def test_login_success(mock_users, _mock_login, client):
+    """Valid login redirects to dashboard."""
+    mock_users.find_one.return_value = {
+        "_id": "507f1f77bcf86cd799439011",
+        "username": "testuser",
+        "password": generate_password_hash("pass123"),
+    }
+    resp = client.post("/login", data={"username": "testuser", "password": "pass123"})
+    assert resp.status_code == 302
+
+
+@patch("app.users_collection")
+def test_login_fail(mock_users, client):
+    """Invalid login shows error."""
+    mock_users.find_one.return_value = None
+    resp = client.post("/login", data={"username": "bad", "password": "bad"})
+    assert resp.status_code == 200
+    assert b"Invalid" in resp.data
+
+
+def test_logout(client):
+    """Logout redirects to login."""
+    resp = client.get("/logout")
+    assert resp.status_code == 302
