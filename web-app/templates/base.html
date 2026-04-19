@@ -11,6 +11,10 @@
     <nav>
         <a href="/dashboard">Dashboard</a>
         <a href="/record">New Session</a>
+        {% if current_user.is_authenticated %}
+        <span>{{ current_user.username }}</span>
+        <a href="/logout">Logout</a>
+        {% endif %}
     </nav>
 
     <div class="container">
