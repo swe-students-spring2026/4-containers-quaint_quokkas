@@ -1,6 +1,7 @@
 """Generate a transcript from a video using Whisper."""
 
 import os
+import subprocess
 
 
 def extract_audio(video_path, audio_path="temp_audio.wav"):
