@@ -1,5 +1,5 @@
-![Build and Test](https://github.com/YOUR_ORG/YOUR_REPO/actions/workflows/full-stack.yml/badge.svg)                
-![Lint](https://github.com/YOUR_ORG/YOUR_REPO/actions/workflows/lint.yml/badge.svg)
+![Build and Test](https://github.com/swe-students-spring2026/4-containers-quaint_quokkas/actions/workflows/full-stack.yml/badge.svg)                
+![Lint](https://github.com/swe-students-spring2026/4-containers-quaint_quokkas/actions/workflows/lint.yml/badge.svg)
 
 # Presently
 
@@ -15,11 +15,13 @@ Presently is a Flask web app designed to help you improve your speaking and pres
 * **User Authentication:** Secure login and registration so your video analysis and history remain private.
 
 ### Team Members
-* (Abid Al Qureshi)[https://github.com/swe-students-spring2026/Abid2422]
-* (Anish Susarla)[https://github.com/swe-students-spring2026/anishs37]
-* (Ethan Arnold)[https://github.com/ethanarnold]
-* (Sanjay Chunduru)[https://github.com/Sanjayc0204]
-* (Vincent Campanaro)[https://github.com/swe-students-spring2026/4-containers-quaint_quokkas/vincentcamp]
+* [Abid Al Qureshi](https://github.com/swe-students-spring2026/Abid2422)
+* [Anish Susarla](https://github.com/swe-students-spring2026/anishs37)
+* [Ethan Arnold](https://github.com/ethanarnold)
+* [Sanjay Chunduru](https://github.com/Sanjayc0204)
+* [Vincent Campanaro](https://github.com/vincentcamp)
+
+[Task Board](https://github.com/orgs/swe-students-spring2026/projects/112/views/2)
 
 ### Setup Instructions
 
