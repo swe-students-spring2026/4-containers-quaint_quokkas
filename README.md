@@ -15,8 +15,8 @@ Presently is a Flask web app designed to help you improve your speaking and pres
 * **User Authentication:** Secure login and registration so your video analysis and history remain private.
 
 ### Team Members
-* [Abid Al Qureshi](https://github.com/swe-students-spring2026/Abid2422)
-* [Anish Susarla](https://github.com/swe-students-spring2026/anishs37)
+* [Abid Al Qureshi](https://github.com/Abid2422)
+* [Anish Susarla](https://github.com/anishs37)
 * [Ethan Arnold](https://github.com/ethanarnold)
 * [Sanjay Chunduru](https://github.com/Sanjayc0204)
 * [Vincent Campanaro](https://github.com/vincentcamp)
@@ -27,7 +27,7 @@ Presently is a Flask web app designed to help you improve your speaking and pres
 
 1. Clone the repository:
 ```bash
-   git clone https://github.com/YOUR_ORG/YOUR_REPO.git
+   git clone https://github.com/swe-students-spring2026/4-containers-quaint_quokkas.git
    cd YOUR_REPO
 ```
 
