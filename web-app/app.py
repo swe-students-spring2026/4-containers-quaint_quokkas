@@ -3,9 +3,10 @@ Speech Practice Tool - Flask backend for recording and analyzing practice sessio
 """
 
 import os
-from datetime import datetime
 import uuid
+from datetime import datetime
 
+import requests
 from flask import Flask, render_template, request, jsonify
 from pymongo import MongoClient
 
@@ -14,6 +15,8 @@ app = Flask(__name__)
 mongo_client = MongoClient(os.environ.get("MONGO_URI"))
 db = mongo_client["speech_practice"]
 sessions_collection = db["sessions"]
+
+ML_CLIENT_URL = os.environ.get("ML_CLIENT_URL", "http://ml-client:8000")
 
 
 # ============================================================================
@@ -44,51 +47,66 @@ def session_detail(session_id):
 # ============================================================================
 
 
-@app.route("/api/analyze/speech", methods=["POST"])
-def analyze_speech():
-    """
-    Speech analysis endpoint.
-    Returns filler words, WPM, and transcript analysis.
-    """
-    if "audio" not in request.files:
-        return jsonify({"error": "No audio file"}), 400
+@app.route("/api/analyze", methods=["POST"])
+def analyze():
+    """Receive a video upload, forward it to the ML client, and store the results."""
+    if "video" not in request.files:
+        return jsonify({"error": "No video file provided"}), 400
 
     session_id = request.form.get("session_id", str(uuid.uuid4()))
+    video_file = request.files["video"]
 
-    session_count = sessions_collection.count_documents({}) + 1
-    title = f"Practice Session {session_count}"
+    try:
+        ml_response = requests.post(
+            f"{ML_CLIENT_URL}/analyze",
+            files={"video": ("recording.webm", video_file.stream, "video/webm")},
+            timeout=600,
+        )
+        ml_response.raise_for_status()
+        ml_result = ml_response.json()
+    except requests.exceptions.RequestException as exc:
+        return jsonify({"error": f"ML client unreachable: {exc}"}), 502
 
-    mock_transcript = (
-        "Thank you for having me today. Um, I'm really excited to talk about this "
-        "project. So, like, we spent a lot of time thinking about the user experience. "
-        "Actually, you know, the biggest challenge was making sure everything works "
-        "smoothly. Uh, we tested it carefully and the performance was really good. "
-        "I think basically what we learned is that planning ahead is incredibly "
-        "important."
+    if "error" in ml_result:
+        return jsonify({"error": ml_result["error"]}), 500
+
+    speech = ml_result.get("speech", {})
+    vision = ml_result.get("vision", {})
+
+    filler_counts = speech.get("filler_counts", {})
+    total_fillers = sum(filler_counts.values())
+    duration_seconds = speech.get("duration_seconds", 0)
+    fillers_per_minute = (
+        round((total_fillers / duration_seconds) * 60, 2)
+        if duration_seconds > 0
+        else 0.0
     )
+
+    session_number = sessions_collection.count_documents({}) + 1
 
     result = {
         "session_id": session_id,
-        "title": title,
+        "title": f"Practice Session {session_number}",
         "created_at": datetime.now().isoformat(),
-        "duration_seconds": 245.0,
-        "transcript": mock_transcript,
-        "word_count": 72,
-        "wpm_overall": 128.5,
+        "duration_seconds": duration_seconds,
+        "transcript": speech.get("transcript", ""),
+        "word_count": speech.get("total_words", 0),
+        "wpm_overall": (
+            round(speech.get("total_words", 0) / (duration_seconds / 60), 1)
+            if duration_seconds > 0
+            else 0
+        ),
         "fillers": {
-            "total": 8,
-            "per_minute": 1.96,
-            "breakdown": {
-                "um": 2,
-                "like": 1,
-                "so": 1,
-                "you know": 1,
-                "actually": 1,
-                "uh": 1,
-                "basically": 1,
-            },
+            "total": total_fillers,
+            "per_minute": fillers_per_minute,
+            "breakdown": filler_counts,
         },
-        "pauses": {"long_pause_count": 3, "filled_pause_count": 2},
+        "pauses": {"long_pause_count": 0, "filled_pause_count": 0},
+        "frames_analyzed": vision.get("total_frames", 0),
+        "eye_contact_pct": vision.get("eye_contact_score", 0),
+        "longest_break_seconds": 0,
+        "smile_mean": 0,
+        "neutral_pct": 0,
     }
 
     sessions_collection.update_one(
@@ -100,48 +118,9 @@ def analyze_speech():
     return jsonify(result)
 
 
-@app.route("/api/analyze/facial", methods=["POST"])
-def analyze_facial():
-    """
-    Facial analysis endpoint.
-    Returns eye contact and expression metrics.
-    """
-    data = request.get_json()
-    if not data:
-        return jsonify({"error": "No JSON body"}), 400
-
-    session_id = data.get("session_id", str(uuid.uuid4()))
-    frames = data.get("frames", [])
-
-    facial_result = {
-        "session_id": session_id,
-        "frames_analyzed": len(frames) if frames else 1225,
-        "eye_contact_pct": 71.0,
-        "longest_break_seconds": 4.2,
-        "smile_mean": 0.14,
-        "neutral_pct": 79.0,
-    }
-
-    sessions_collection.update_one(
-        {"session_id": session_id},
-        {
-            "$set": {
-                "frames_analyzed": facial_result["frames_analyzed"],
-                "eye_contact_pct": facial_result["eye_contact_pct"],
-                "longest_break_seconds": facial_result["longest_break_seconds"],
-                "smile_mean": facial_result["smile_mean"],
-                "neutral_pct": facial_result["neutral_pct"],
-            }
-        },
-        upsert=True,
-    )
-
-    return jsonify(facial_result)
-
-
 @app.route("/api/sessions", methods=["GET"])
 def get_sessions():
-    """Fetch all sessions for the dashboard, ordered by most recent."""
+    """Fetch all sessions for the dashboard, newest first."""
     docs = list(
         sessions_collection.find(
             {},

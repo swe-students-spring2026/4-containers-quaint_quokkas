@@ -87,6 +87,3 @@ def analyze_vision(video_path):
         "eye_contact_score": round(pct, 2),
         "feedback": "Excellent" if pct >= 85 else "Good" if pct >= 65 else "Needs work",
     }
-
-
-print(analyze_vision("test_vid.mov"))
