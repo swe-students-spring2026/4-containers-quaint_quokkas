@@ -11,7 +11,7 @@ def test_no_video():
     resp = client.post("/analyze", data={})
     assert resp.status_code == 400
 
-@patch("app.current_user", MagicMock(id="507f1f77bcf86cd799439011", is_authenticated=True))
+
 @patch("mlserver.analyze_vision", return_value={"eye_contact_score": 90})
 @patch("mlserver.analyze_speech", return_value={"transcript": "hi"})
 @patch("mlserver.get_duration", return_value=12.5)

@@ -40,7 +40,7 @@ def test_analyze_no_video(client):
     resp = client.post("/api/analyze", data={})
     assert resp.status_code == 400
 
-
+@patch("app.current_user", MagicMock(id="507f1f77bcf86cd799439011", is_authenticated=True))
 @patch("app.sessions_collection")
 @patch("app.requests.post")
 def test_analyze_success(mock_post, mock_coll, client):
