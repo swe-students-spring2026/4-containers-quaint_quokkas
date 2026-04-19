@@ -49,6 +49,7 @@ def session_detail(session_id):
 
 @app.route("/api/analyze", methods=["POST"])
 def analyze():
+    """Receive a video upload, forward it to the ML client, and store the results."""
     if "video" not in request.files:
         return jsonify({"error": "No video file provided"}), 400
 
