@@ -8,6 +8,11 @@ opencv-python-headless = "*"
 mediapipe = "*"
 pymongo = "*"
 flask = "*"
+moviepy = "*"                               
+openai-whisper = "*"                        
+torch = "*"                                 
+torchaudio = "*"                        
+numpy = "*"
 
 [dev-packages]
 pylint = "*"
