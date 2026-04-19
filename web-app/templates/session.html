@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}Session Results - Speech Practice Tool{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 2rem;">
+    <a href="/" style="text-decoration: none; color: #0066cc;">← Back to dashboard</a>
+</div>
+
+<h1 id="sessionTitle">Session Results</h1>
+<p id="sessionDate" style="color: #999;">Loading...</p>
+
+<div class="card">
+    <h2>Summary</h2>
+    <div>
+        <div class="stat">
+            <div class="stat-label">Duration</div>
+            <div class="stat-value" id="metricDuration">-</div>
+        </div>
+        <div class="stat">
+            <div class="stat-label">Words</div>
+            <div class="stat-value" id="metricWords">-</div>
+        </div>
+        <div class="stat">
+            <div class="stat-label">Words per minute</div>
+            <div class="stat-value" id="metricWPM">-</div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Filler words</h2>
+    <div>
+        <div class="stat">
+            <div class="stat-label">Total fillers</div>
+            <div class="stat-value" id="metricFillerTotal">-</div>
+        </div>
+        <div class="stat">
+            <div class="stat-label">Per minute</div>
+            <div class="stat-value" id="metricFillerPerMin">-</div>
+        </div>
+    </div>
+    <h3 style="margin-top: 1.5rem;">Breakdown</h3>
+    <div id="fillerBreakdown" style="margin-top: 1rem;">
+        Loading...
+    </div>
+</div>
+
+<div class="card">
+    <h2>Eye contact & expression</h2>
+    <div>
+        <div class="stat">
+            <div class="stat-label">Eye contact</div>
+            <div class="stat-value" id="metricEyeContact">-</div>
+        </div>
+        <div class="stat">
+            <div class="stat-label">Longest break</div>
+            <div class="stat-value" id="metricLongestBreak">-</div>
+        </div>
+        <div class="stat">
+            <div class="stat-label">Smile intensity</div>
+            <div class="stat-value" id="metricSmile">-</div>
+        </div>
+        <div class="stat">
+            <div class="stat-label">Neutral expression</div>
+            <div class="stat-value" id="metricNeutral">-</div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Pauses</h2>
+    <div>
+        <div class="stat">
+            <div class="stat-label">Long pauses (&gt;1.5s)</div>
+            <div class="stat-value" id="metricLongPauses">-</div>
+        </div>
+        <div class="stat">
+            <div class="stat-label">Filled pauses</div>
+            <div class="stat-value" id="metricFilledPauses">-</div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Transcript</h2>
+    <p id="transcript" style="line-height: 1.8; background: #f5f5f5; padding: 1rem; border-radius: 4px;">
+        Loading...
+    </p>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const sessionId = '{{ session_id }}';
+
+    async function loadSession() {
+        try {
+            const data = await fetchAPI(`/api/sessions/${sessionId}`);
+            renderSession(data);
+        } catch (error) {
+            alert('Error loading session: ' + error.message);
+        }
+    }
+
+    function renderSession(data) {
+        document.getElementById('sessionTitle').textContent = data.title;
+        document.getElementById('sessionDate').textContent = new Date(data.created_at).toLocaleDateString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+
+        // Summary
+        document.getElementById('metricDuration').textContent = formatTime(data.duration_seconds);
+        document.getElementById('metricWords').textContent = data.word_count;
+        document.getElementById('metricWPM').textContent = Math.round(data.wpm_overall);
+
+        // Fillers
+        document.getElementById('metricFillerTotal').textContent = data.fillers_total;
+        document.getElementById('metricFillerPerMin').textContent = data.fillers_per_minute.toFixed(2);
+
+        // Filler breakdown
+        const breakdownHTML = Object.entries(data.fillers_breakdown)
+            .map(([word, count]) => `
+                <div style="margin-bottom: 0.5rem;">
+                    <strong>"${word}"</strong>: ${count} ${count === 1 ? 'time' : 'times'}
+                </div>
+            `)
+            .join('');
+        document.getElementById('fillerBreakdown').innerHTML = breakdownHTML;
+
+        // Eye contact & expression
+        document.getElementById('metricEyeContact').textContent = data.eye_contact_pct.toFixed(1) + '%';
+        document.getElementById('metricLongestBreak').textContent = data.longest_break_seconds.toFixed(1) + 's';
+        document.getElementById('metricSmile').textContent = (data.smile_mean * 100).toFixed(0) + '%';
+        document.getElementById('metricNeutral').textContent = data.neutral_pct.toFixed(0) + '%';
+
+        // Pauses
+        document.getElementById('metricLongPauses').textContent = data.long_pause_count;
+        document.getElementById('metricFilledPauses').textContent = data.filled_pause_count;
+
+        // Transcript with highlighted fillers
+        let transcript = data.transcript;
+        Object.keys(data.fillers_breakdown).forEach(word => {
+            const regex = new RegExp(`\\b${word}\\b`, 'gi');
+            transcript = transcript.replace(regex, `<span class="highlight">${word}</span>`);
+        });
+        document.getElementById('transcript').innerHTML = transcript;
+    }
+
+    loadSession();
+</script>
+{% endblock %}

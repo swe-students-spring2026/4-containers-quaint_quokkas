@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block title %}New Recording - Speech Practice Tool{% endblock %}
+
+{% block content %}
+<h1>Start new practice session</h1>
+
+<div class="card">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+        <div>
+            <h2>Camera preview</h2>
+            <video id="videoPreview" playsinline autoplay muted></video>
+        </div>
+        <div>
+            <h2>Recording</h2>
+            
+            <div id="controls">
+                <button id="startBtn" onclick="startRecording()" style="width: 100%; padding: 1rem; font-size: 16px; background: #28a745;">
+                    Start recording
+                </button>
+                <button id="stopBtn" onclick="stopRecording()" style="width: 100%; padding: 1rem; font-size: 16px; background: #dc3545; margin-top: 0.5rem; display: none;">
+                    Stop recording
+                </button>
+            </div>
+
+            <div id="recordingStatus" style="display: none; margin-top: 1.5rem;">
+                <div class="recording-indicator">
+                    <span class="rec-dot"></span>
+                    Recording...
+                </div>
+                <div class="timer" id="recordingTime">0:00</div>
+                <p style="font-size: 14px; color: #666;">Speak naturally. We're recording your audio and analyzing your expressions.</p>
+            </div>
+
+            <div id="analyzeStatus" style="display: none; margin-top: 1.5rem; padding: 1rem; background: #e7f3ff; border-radius: 4px;">
+                <p style="font-weight: bold;">Analyzing your session...</p>
+                <p style="font-size: 13px; color: #666; margin-top: 0.5rem;">Processing speech and expressions.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    let mediaRecorder;
+    let recordingStartTime;
+    let recordingInterval;
+    let stream;
+    let frameBuffer = [];
+    let videoChunks = [];
+
+    const videoPreview = document.getElementById('videoPreview');
+
+    async function startRecording() {
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({
+                video: {
+                    width: { ideal: 640 },
+                    height: { ideal: 480 }
+                },
+                audio: true
+            });
+
+            videoPreview.srcObject = stream;
+
+            mediaRecorder = new MediaRecorder(stream);
+            videoChunks = [];
+
+            mediaRecorder.ondataavailable = (event) => {
+                videoChunks.push(event.data);
+            };
+
+            mediaRecorder.start();
+
+            recordingStartTime = Date.now();
+            recordingInterval = setInterval(updateTime, 100);
+
+            document.getElementById('startBtn').style.display = 'none';
+            document.getElementById('stopBtn').style.display = 'block';
+            document.getElementById('recordingStatus').style.display = 'block';
+
+        } catch (error) {
+            alert('Failed to access camera/microphone: ' + error.message);
+        }
+    }
+
+    function updateTime() {
+        const elapsed = (Date.now() - recordingStartTime) / 1000;
+        document.getElementById('recordingTime').textContent = formatTime(elapsed);
+    }
+
+    async function stopRecording() {
+        return new Promise((resolve) => {
+            mediaRecorder.onstop = async () => {
+                clearInterval(recordingInterval);
+                stream.getTracks().forEach(track => track.stop());
+
+                document.getElementById('recordingStatus').style.display = 'none';
+                document.getElementById('analyzeStatus').style.display = 'block';
+                document.getElementById('stopBtn').style.display = 'none';
+
+                await processAndUpload();
+                resolve();
+            };
+
+            mediaRecorder.stop();
+        });
+    }
+
+    async function processAndUpload() {
+        try {
+            const audioBlob = new Blob(videoChunks, { type: 'audio/webm' });
+            const sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+
+            console.log('Uploading audio for analysis...');
+
+            const speechFormData = new FormData();
+            speechFormData.append('audio', audioBlob, 'audio.webm');
+            speechFormData.append('session_id', sessionId);
+
+            const speechAnalysis = await fetchAPI('/api/analyze/speech', {
+                method: 'POST',
+                body: speechFormData
+            });
+
+            const facialAnalysis = await fetchAPI('/api/analyze/facial', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    session_id: sessionId,
+                    frames: frameBuffer
+                })
+            });
+
+            console.log('Analysis complete. Redirecting...');
+            window.location.href = `/session/${sessionId}`;
+
+        } catch (error) {
+            alert('Error processing recording: ' + error.message);
+            document.getElementById('analyzeStatus').style.display = 'none';
+            document.getElementById('recordingStatus').style.display = 'block';
+            document.getElementById('stopBtn').style.display = 'block';
+        }
+    }
+</script>
+{% endblock %}

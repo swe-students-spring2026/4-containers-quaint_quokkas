@@ -1,0 +1,172 @@
+body {
+  margin: 0;
+  padding: 0;
+  background: #f5f5f5;
+}
+
+nav {
+  background: white;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 2rem;
+}
+
+nav a {
+  margin-right: 2rem;
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+}
+
+nav a:hover {
+  color: #0066cc;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+h1 {
+  font-size: 32px;
+  margin: 0 0 1rem 0;
+}
+
+h2 {
+  font-size: 20px;
+  margin: 2rem 0 1rem 0;
+}
+
+h3 {
+  font-size: 16px;
+  margin: 1rem 0 0.5rem 0;
+}
+
+button {
+  background: #0066cc;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #0052a3;
+}
+
+button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.card {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.stat {
+  display: inline-block;
+  margin-right: 2rem;
+  margin-bottom: 1rem;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #999;
+  text-transform: uppercase;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: bold;
+  color: #0066cc;
+}
+
+video {
+  width: 100%;
+  max-width: 400px;
+  background: #000;
+  border-radius: 4px;
+  margin: 1rem 0;
+}
+
+.session-item {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  cursor: pointer;
+}
+
+.session-item:hover {
+  border-color: #0066cc;
+  box-shadow: 0 2px 8px rgba(0, 102, 204, 0.1);
+}
+
+.session-item-title {
+  font-weight: bold;
+  color: #0066cc;
+  text-decoration: none;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.session-item-date {
+  font-size: 12px;
+  color: #999;
+  margin-bottom: 1rem;
+}
+
+.recording-indicator {
+  display: inline-block;
+  background: #dc3545;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  margin: 1rem 0;
+  font-weight: bold;
+}
+
+.rec-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  background: white;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.timer {
+  font-size: 32px;
+  font-weight: bold;
+  text-align: center;
+  margin: 1rem 0;
+}
+
+textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  min-height: 100px;
+  font-family: inherit;
+}
+
+.highlight {
+  background: #ffeb3b;
+  padding: 0.2em 0.4em;
+  border-radius: 2px;
+}
