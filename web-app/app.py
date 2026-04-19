@@ -37,7 +37,6 @@ ML_CLIENT_URL = os.environ.get("ML_CLIENT_URL", "http://ml-client:8000")
 
 
 class User(UserMixin):
-
     """Class for user"""
 
     def __init__(self, user_id, username):
@@ -47,7 +46,6 @@ class User(UserMixin):
 
 @login_manager.user_loader
 def load_user(user_id):
-
     """Load user from database by ID."""
 
     user_doc = users_collection.find_one({"_id": ObjectId(user_id)})
@@ -63,7 +61,6 @@ def load_user(user_id):
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
-
     """Register a new user."""
 
     if request.method == "POST":
@@ -86,7 +83,6 @@ def register():
 @app.route("/")
 @app.route("/login", methods=["GET", "POST"])
 def login():
-
     """Login an existing user."""
 
     if request.method == "POST":
@@ -104,7 +100,6 @@ def login():
 @app.route("/logout")
 @login_required
 def logout():
-
     """Logout"""
 
     logout_user()
