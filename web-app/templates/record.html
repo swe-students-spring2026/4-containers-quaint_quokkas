@@ -10,16 +10,18 @@
         <div>
             <h2>Camera preview</h2>
             <video id="videoPreview" playsinline autoplay muted></video>
-            <canvas id="frameCanvas" style="display: none;"></canvas>
         </div>
         <div>
             <h2>Recording</h2>
 
             <div id="controls">
-                <button id="startBtn" onclick="startRecording()" style="width: 100%; padding: 1rem; font-size: 16px; background: #28a745;">
+                <button id="startBtn" onclick="startRecording()"
+                        style="width: 100%; padding: 1rem; font-size: 16px; background: #28a745;">
                     Start recording
                 </button>
-                <button id="stopBtn" onclick="stopRecording()" style="width: 100%; padding: 1rem; font-size: 16px; background: #dc3545; margin-top: 0.5rem; display: none;">
+                <button id="stopBtn" onclick="stopRecording()"
+                        style="width: 100%; padding: 1rem; font-size: 16px; background: #dc3545;
+                               margin-top: 0.5rem; display: none;">
                     Stop recording
                 </button>
             </div>
@@ -30,12 +32,18 @@
                     Recording...
                 </div>
                 <div class="timer" id="recordingTime">0:00</div>
-                <p style="font-size: 14px; color: #666;">Speak naturally. We're recording your audio and analyzing your expressions.</p>
+                <p style="font-size: 14px; color: #666;">
+                    Speak naturally. We're recording your audio and video for analysis.
+                </p>
             </div>
 
-            <div id="analyzeStatus" style="display: none; margin-top: 1.5rem; padding: 1rem; background: #e7f3ff; border-radius: 4px;">
-                <p style="font-weight: bold;">Analyzing your session...</p>
-                <p style="font-size: 13px; color: #666; margin-top: 0.5rem;">Processing speech and expressions.</p>
+            <div id="analyzeStatus" style="display: none; margin-top: 1.5rem;
+                                           padding: 1rem; background: #e7f3ff; border-radius: 4px;">
+                <p style="font-weight: bold;">Analyzing your session…</p>
+                <p style="font-size: 13px; color: #666; margin-top: 0.5rem;">
+                    Running speech recognition and eye-contact analysis.
+                    This may take a minute.
+                </p>
             </div>
         </div>
     </div>
@@ -47,17 +55,10 @@
     let mediaRecorder;
     let recordingStartTime;
     let recordingInterval;
-    let frameInterval;
     let stream;
-    let frameBuffer = [];
     let videoChunks = [];
 
     const videoPreview = document.getElementById('videoPreview');
-
-    const canvas = document.getElementById('frameCanvas');
-    const ctx = canvas.getContext('2d');
-    canvas.width = 320;
-    canvas.height = 240;
 
     async function startRecording() {
         try {
@@ -68,23 +69,18 @@
 
             videoPreview.srcObject = stream;
 
-            mediaRecorder = new MediaRecorder(stream);
+            const mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus')
+                ? 'video/webm;codecs=vp9,opus'
+                : 'video/webm';
+
+            mediaRecorder = new MediaRecorder(stream, { mimeType });
             videoChunks = [];
-            frameBuffer = [];
 
             mediaRecorder.ondataavailable = (event) => {
-                videoChunks.push(event.data);
+                if (event.data.size > 0) videoChunks.push(event.data);
             };
 
-            mediaRecorder.start();
-
-            // Capture one JPEG frame per second for facial analysis (capped at 60)
-            frameInterval = setInterval(() => {
-                if (frameBuffer.length < 60) {
-                    ctx.drawImage(videoPreview, 0, 0, 320, 240);
-                    frameBuffer.push(canvas.toDataURL('image/jpeg', 0.5));
-                }
-            }, 1000);
+            mediaRecorder.start(1000);
 
             recordingStartTime = Date.now();
             recordingInterval = setInterval(updateTime, 100);
@@ -103,18 +99,17 @@
         document.getElementById('recordingTime').textContent = formatTime(elapsed);
     }
 
-    async function stopRecording() {
+    function stopRecording() {
         return new Promise((resolve) => {
             mediaRecorder.onstop = async () => {
                 clearInterval(recordingInterval);
-                clearInterval(frameInterval);
                 stream.getTracks().forEach(track => track.stop());
 
                 document.getElementById('recordingStatus').style.display = 'none';
                 document.getElementById('analyzeStatus').style.display = 'block';
                 document.getElementById('stopBtn').style.display = 'none';
 
-                await processAndUpload();
+                await uploadAndAnalyze();
                 resolve();
             };
 
@@ -122,32 +117,19 @@
         });
     }
 
-    async function processAndUpload() {
+    async function uploadAndAnalyze() {
         try {
-            const audioBlob = new Blob(videoChunks, { type: 'audio/webm' });
             const sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
 
-            console.log('Uploading audio for analysis...');
+            const formData = new FormData();
+            formData.append('video', new Blob(videoChunks, { type: 'video/webm' }), 'recording.webm');
+            formData.append('session_id', sessionId);
 
-            const speechFormData = new FormData();
-            speechFormData.append('audio', audioBlob, 'audio.webm');
-            speechFormData.append('session_id', sessionId);
-
-            await fetchAPI('/api/analyze/speech', {
+            await fetchAPI('/api/analyze', {
                 method: 'POST',
-                body: speechFormData
+                body: formData
             });
 
-            await fetchAPI('/api/analyze/facial', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    session_id: sessionId,
-                    frames: frameBuffer
-                })
-            });
-
-            console.log('Analysis complete. Redirecting...');
             window.location.href = `/session/${sessionId}`;
 
         } catch (error) {

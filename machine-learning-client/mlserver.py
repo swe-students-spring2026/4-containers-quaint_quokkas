@@ -17,13 +17,17 @@ def analyze():
     # Save to temp file, analyze, clean up
     tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".webm")
     video.save(tmp.name)
+    tmp.close()
 
     try:
-        speech = analyze_speech(tmp.name)
-        vision = analyze_vision(tmp.name)
-        return jsonify({"speech": speech, "vision": vision})
+        speech_result = analyze_speech(tmp.name)
+        vision_result = analyze_vision(tmp.name)
+        return jsonify({"speech": speech_result, "vision": vision_result})
+    except Exception as exc:  # pylint: disable=broad-except
+        return jsonify({"error": str(exc)}), 500
     finally:
-        os.unlink(tmp.name)
+        if os.path.exists(tmp.name):
+            os.unlink(tmp.name)
 
 
 if __name__ == "__main__":
