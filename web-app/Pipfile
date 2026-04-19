@@ -5,9 +5,9 @@ name = "pypi"
 
 [packages]
 flask = "*"
+tomli = "*"
 
 [dev-packages]
-tomli = ">=2.0.0"
 black = "*"
 pylint = "*"
 
