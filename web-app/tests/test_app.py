@@ -1,4 +1,5 @@
 """Tests for the Flask web app. Mongo and ML client are mocked."""
+
 # pylint: disable=redefined-outer-name
 
 import io

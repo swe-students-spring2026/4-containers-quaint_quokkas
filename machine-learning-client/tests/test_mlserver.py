@@ -14,7 +14,7 @@ def test_no_video():
 
 @patch("mlserver.analyze_vision", return_value={"eye_contact_score": 90})
 @patch("mlserver.analyze_speech", return_value={"transcript": "hi"})
-@patch("mlserver.VideoFileClip")
+@patch("mlserver.VideoFileClip", create=True)
 def test_analyze_success(mock_clip, _mock_speech, _mock_vision):
     """Valid upload returns speech and vision results."""
     mock_clip.return_value.duration = 12.5
@@ -27,7 +27,7 @@ def test_analyze_success(mock_clip, _mock_speech, _mock_vision):
     assert body["vision"]["eye_contact_score"] == 90
 
 
-@patch("mlserver.VideoFileClip", side_effect=RuntimeError("boom"))
+@patch("mlserver.VideoFileClip", side_effect=RuntimeError("boom"), create=True)
 def test_analyze_error(_mock_clip):
     """Exception during analysis returns 500."""
     client = mlserver.app.test_client()

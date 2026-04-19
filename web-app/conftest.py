@@ -1,4 +1,5 @@
 """Pytest configuration for the web-app tests."""
+
 # pylint: disable=wrong-import-position
 
 import sys
