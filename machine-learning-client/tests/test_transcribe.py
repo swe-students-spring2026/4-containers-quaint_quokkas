@@ -1,5 +1,6 @@
 """Tests for video transcription. Whisper and moviepy are mocked."""
 
+import sys
 from unittest.mock import patch, MagicMock
 import transcribe
 
@@ -18,7 +19,6 @@ def test_extract_audio(mock_run):
 @patch("transcribe.extract_audio", return_value="temp_audio.wav")
 def test_transcribe_video(mock_extract, _mock_exists, mock_remove):
     """transcribe_video returns the model's text and cleans up the temp file."""
-    import sys
 
     mock_whisper = MagicMock()
     mock_model = MagicMock()
