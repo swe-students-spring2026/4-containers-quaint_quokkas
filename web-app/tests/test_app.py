@@ -46,7 +46,7 @@ def test_analyze_no_video(client):
 )
 @patch("app.sessions_collection")
 @patch("app.requests.post")
-def test_analyze_success(mock_post, mock_coll, _mock_user, client):
+def test_analyze_success(mock_post, mock_coll, client):
     """Analyze stores session and returns results."""
     mock_post.return_value = MagicMock(
         status_code=200,
