@@ -5,11 +5,11 @@ name = "pypi"
 
 [packages]
 flask = "*"
-
-[dev-packages]
 pylint = "*"
 black = "*"
 tomli = "*"
+
+[dev-packages]
 
 [requires]
 python_version = "3.10"
