@@ -41,7 +41,7 @@ Presently is a Flask web app designed to help you improve your speaking and pres
    docker-compose up --build
 ```
 
-4. Access the application:
+4. Access the application **(Please use Chrome instead of Safari or any other browser)**:
    - Web app: http://localhost:3000
    - ML client API: http://localhost:8000
 
@@ -49,6 +49,7 @@ Presently is a Flask web app designed to help you improve your speaking and pres
 ```bash
    docker-compose down
 ```
+*Note, it does take some time to analyze your speech and video*
 
 ### Environment Variables
 
