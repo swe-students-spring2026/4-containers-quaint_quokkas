@@ -1,4 +1,5 @@
-![Lint-free](https://github.com/nyu-software-engineering/containerized-app-exercise/actions/workflows/lint.yml/badge.svg)
+![Build and Test](https://github.com/YOUR_ORG/YOUR_REPO/actions/workflows/full-stack.yml/badge.svg)                
+![Lint](https://github.com/YOUR_ORG/YOUR_REPO/actions/workflows/lint.yml/badge.svg)
 
 # Presently
 
@@ -12,3 +13,50 @@ Presently is a Flask web app designed to help you improve your speaking and pres
 * **Focus Scoring:** Aggregates video and audio metrics to give you an overall focus and performance score.
 * **Progress Tracking:** Saves your results to our database so you can view your historical data and see how you improve.
 * **User Authentication:** Secure login and registration so your video analysis and history remain private.
+
+### Team Members
+* (Abid Al Qureshi)[https://github.com/swe-students-spring2026/Abid2422]
+* (Anish Susarla)[https://github.com/swe-students-spring2026/anishs37]
+* (Ethan Arnold)[https://github.com/ethanarnold]
+* (Sanjay Chunduru)[https://github.com/Sanjayc0204]
+* (Vincent Campanaro)[https://github.com/swe-students-spring2026/4-containers-quaint_quokkas/vincentcamp]
+
+### Setup Instructions
+
+1. Clone the repository:
+```bash
+   git clone https://github.com/YOUR_ORG/YOUR_REPO.git
+   cd YOUR_REPO
+```
+
+2. Create your environment file:
+```bash
+   cp env.example .env
+```
+
+3. Build and start all containers:
+```bash
+   docker-compose up --build
+```
+
+4. Access the application:
+   - Web app: http://localhost:3000
+   - ML client API: http://localhost:8000
+
+5. To stop all containers:
+```bash
+   docker-compose down
+```
+
+### Environment Variables
+
+| Variable | Description | Default |
+|---|---|---|
+| `MONGO_URI` | MongoDB connection string | `mongodb://mongodb:27017/mydb` |
+
+### Database
+
+MongoDB runs automatically via Docker Compose with persistent storage. No manual setup or seed data is required.
+
+
+
