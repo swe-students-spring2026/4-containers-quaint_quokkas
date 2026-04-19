@@ -10,7 +10,6 @@ import requests as req_lib
 import app as webapp
 
 
-
 @pytest.fixture
 def client():
     """Create a test client."""
@@ -148,6 +147,7 @@ def test_get_session_found(mock_coll, client):
     resp = client.get("/api/sessions/s1")
     assert resp.status_code == 200
     assert resp.get_json()["fillers_total"] == 2
+
 
 @patch("app.users_collection")
 def test_register_get(_mock_users, client):
