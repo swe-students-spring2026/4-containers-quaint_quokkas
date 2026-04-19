@@ -6,12 +6,26 @@ import subprocess
 
 def extract_audio(video_path, audio_path="temp_audio.wav"):
     """Pull the audio track out of a video file and write it to disk."""
-    import subprocess                       
-    subprocess.run(                         
-        ["ffmpeg", "-y", "-i", video_path, "-vn", "-acodec", "pcm_s16le",                                                                                                                                       
-        "-ar", "16000", "-ac", "1", audio_path],
-        capture_output=True, check=True                                                                                                                                                                         
-    )                                                                            
+    import subprocess
+
+    subprocess.run(
+        [
+            "ffmpeg",
+            "-y",
+            "-i",
+            video_path,
+            "-vn",
+            "-acodec",
+            "pcm_s16le",
+            "-ar",
+            "16000",
+            "-ac",
+            "1",
+            audio_path,
+        ],
+        capture_output=True,
+        check=True,
+    )
     return audio_path
 
 

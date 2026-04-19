@@ -1,20 +1,25 @@
 import os
 import tempfile
-import subprocess 
+import subprocess
 from flask import Flask, request, jsonify
 from analyze_speech import analyze_speech
 from analyze_video import analyze_vision
 
 app = Flask(__name__)
 
+
 def get_duration(video_path):
     result = subprocess.run(
         [
             "ffprobe",
-            "-v", "quiet",
-            "-select_streams", "a:0",
-            "-show_entries", "packet=pts_time",
-            "-of", "csv=p=0",
+            "-v",
+            "quiet",
+            "-select_streams",
+            "a:0",
+            "-show_entries",
+            "packet=pts_time",
+            "-of",
+            "csv=p=0",
             video_path,
         ],
         capture_output=True,
@@ -26,8 +31,8 @@ def get_duration(video_path):
     except (ValueError, IndexError):
         return 0.0
 
-@app.route("/analyze", methods=["POST"])
 
+@app.route("/analyze", methods=["POST"])
 def analyze():
     if "video" not in request.files:
         return jsonify({"error": "No video file"}), 400
@@ -45,9 +50,10 @@ def analyze():
         vision_result = analyze_vision(tmp.name)
         return jsonify({"speech": speech_result, "vision": vision_result})
     except Exception as exc:  # pylint: disable=broad-except
-        import traceback                                                                                                                                                                                        
-        traceback.print_exc()                                                                                                                                                                                   
-        return jsonify({"error": str(exc)}), 500 
+        import traceback
+
+        traceback.print_exc()
+        return jsonify({"error": str(exc)}), 500
     finally:
         if os.path.exists(tmp.name):
             os.unlink(tmp.name)
