@@ -1,20 +1,21 @@
-![Build and Test](https://github.com/swe-students-spring2026/4-containers-quaint_quokkas/actions/workflows/full-stack.yml/badge.svg)                
+![Web App](https://github.com/swe-students-spring2026/4-containers-quaint_quokkas/actions/workflows/web-app.yml/badge.svg)
+![ML Client](https://github.com/swe-students-spring2026/4-containers-quaint_quokkas/actions/workflows/ml-client.yml/badge.svg)
 ![Lint](https://github.com/swe-students-spring2026/4-containers-quaint_quokkas/actions/workflows/lint.yml/badge.svg)
 
 # Presently
 
 ### Project Description
-Presently is a Flask web app designed to help you improve your speaking and presentation skills. Users can record video directly in the browser, and the app uses machine learning to analyze both the video feed and speech. By tracking metrics like eye contact and speech patterns, Presently calculates a "focus" score to give you actionable feedback. The app does not require user authentication as it only requires a local database to run.
+Presently is a Flask web app designed to help you improve your speaking and presentation skills. Users can record video directly in the browser, and the app uses machine learning to analyze both the video feed and speech. By tracking metrics like eye contact and speech patterns, Presently calculates a "focus" score to give you actionable feedback. The app features user authentication to track multiple users progress on their speaking skills.
 
 ### Main Features
 * **Video & Audio Analysis:** Processes user-recorded video to evaluate presentation delivery.
 * **Eye Contact Tracking:** Uses MediaPipe to determine how many frames you spend actually looking at the camera.
 * **Filler Word Detection:** Transcribes your speech to find and count filler words (e.g., "um", "uh", "like").
 * **Focus Scoring:** Aggregates video and audio metrics to give you an overall focus and performance score.
-* **Progress Tracking:** Saves your results to our database so you can view your historical data and see how you improve.
+* **Progress Tracking:** Saves your results to our database (with user authentication) so you can view your historical data and see how you improve.
 
 ### Team Members
-* [Abid Al Qureshi](https://github.com/Abid2422)
+* [Abid Ali Qureshi](https://github.com/Abid2422)
 * [Anish Susarla](https://github.com/anishs37)
 * [Ethan Arnold](https://github.com/ethanarnold)
 * [Sanjay Chunduru](https://github.com/Sanjayc0204)
