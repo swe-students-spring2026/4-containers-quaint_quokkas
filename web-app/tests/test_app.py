@@ -86,7 +86,7 @@ def test_analyze_ml_error(mock_post, client):
     resp = client.post("/api/analyze", data=data, content_type="multipart/form-data")
     assert resp.status_code == 500
 
-
+@patch("app.current_user", MagicMock(id="507f1f77bcf86cd799439011", is_authenticated=True))
 @patch("app.sessions_collection")
 def test_get_sessions(mock_coll, client):
     """Sessions API returns list."""
@@ -107,7 +107,7 @@ def test_get_sessions(mock_coll, client):
     assert resp.status_code == 200
     assert resp.get_json()[0]["session_id"] == "a"
 
-
+@patch("app.current_user", MagicMock(id="507f1f77bcf86cd799439011", is_authenticated=True))
 @patch("app.sessions_collection")
 def test_get_session_not_found(mock_coll, client):
     """Missing session returns 404."""
@@ -115,7 +115,7 @@ def test_get_session_not_found(mock_coll, client):
     resp = client.get("/api/sessions/nope")
     assert resp.status_code == 404
 
-
+@patch("app.current_user", MagicMock(id="507f1f77bcf86cd799439011", is_authenticated=True))
 @patch("app.sessions_collection")
 def test_get_session_found(mock_coll, client):
     """Existing session returns full data."""
