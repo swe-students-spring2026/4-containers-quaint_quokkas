@@ -168,7 +168,7 @@ def analyze():
         else 0.0
     )
 
-    session_number = sessions_collection.count_documents({}) + 1
+    session_number = sessions_collection.count_documents({"user_id": ObjectId(current_user.id)}) + 1 
 
     result = {
         "session_id": session_id,
