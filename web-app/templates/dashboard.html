@@ -3,11 +3,36 @@
 {% block title %}Dashboard - Speech Practice Tool{% endblock %}
 
 {% block content %}
-<h1>Dashboard</h1>
-<p>Your past practice sessions</p>
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+    <div>
+        <h1 style="margin-bottom: 0.25rem;">Dashboard</h1>
+        <p style="color: #999; margin: 0;">Your past practice sessions</p>
+    </div>
+    <a href="/record">
+        <button>+ New Session</button>
+    </a>
+</div>
+
+<div class="card" id="chartCard" style="display: none;">
+    <h2 style="margin-top: 0;">Progress over time</h2>
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem;">
+        <div>
+            <h3 style="margin-top: 0;">Filler words / min</h3>
+            <canvas id="fillersChart" height="140"></canvas>
+        </div>
+        <div>
+            <h3 style="margin-top: 0;">Words per minute</h3>
+            <canvas id="wpmChart" height="140"></canvas>
+        </div>
+        <div>
+            <h3 style="margin-top: 0;">Eye contact %</h3>
+            <canvas id="eyeChart" height="140"></canvas>
+        </div>
+    </div>
+</div>
 
 <div id="sessionsList">
-    <p>Loading sessions...</p>
+    <p style="color: #999;">Loading sessions...</p>
 </div>
 
 {% endblock %}
@@ -16,19 +41,35 @@
 <script>
     async function loadSessions() {
         try {
-            const sessions = await fetchAPI('/api/sessions?user_id=demo_user');
+            const sessions = await fetchAPI('/api/sessions');
             renderSessions(sessions);
+            if (sessions.length > 1) {
+                renderCharts(sessions);
+            }
         } catch (error) {
             document.getElementById('sessionsList').innerHTML = '<p style="color: red;">Error loading sessions</p>';
         }
     }
 
     function renderSessions(sessions) {
+        if (sessions.length === 0) {
+            document.getElementById('sessionsList').innerHTML = `
+                <div class="card" style="text-align: center; padding: 3rem; color: #999;">
+                    <p style="font-size: 18px; margin-bottom: 1.5rem;">No sessions yet — record your first one!</p>
+                    <a href="/record"><button style="font-size: 16px; padding: 0.75rem 2rem;">Start your first session</button></a>
+                </div>`;
+            return;
+        }
+
         const html = sessions.map(session => `
             <div class="session-item" onclick="window.location.href = '/session/${session.session_id}'">
                 <a href="/session/${session.session_id}" class="session-item-title">${session.title}</a>
-                <div class="session-item-date">${new Date(session.created_at).toLocaleDateString()}</div>
-                <div>
+                <div class="session-item-date">
+                    ${new Date(session.created_at).toLocaleDateString('en-US', {
+                        weekday: 'short', year: 'numeric', month: 'short', day: 'numeric'
+                    })}
+                </div>
+                <div class="stat-grid">
                     <div class="stat">
                         <div class="stat-label">Fillers per minute</div>
                         <div class="stat-value">${session.fillers_per_minute}</div>
@@ -46,6 +87,45 @@
         `).join('');
         
         document.getElementById('sessionsList').innerHTML = html;
+    }
+
+    function makeChart(canvasId, labels, values, color) {
+        const ctx = document.getElementById(canvasId).getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels,
+                datasets: [{
+                    data: values,
+                    borderColor: color,
+                    backgroundColor: color + '22',
+                    borderWidth: 2,
+                    tension: 0.3,
+                    fill: true,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                }]
+            },
+            options: {
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { ticks: { maxTicksLimit: 6, font: { size: 11 } } },
+                    y: { ticks: { font: { size: 11 } }, beginAtZero: false }
+                },
+                responsive: true,
+                maintainAspectRatio: false,
+            }
+        });
+    }
+
+    function renderCharts(sessions) {
+        const ordered = [...sessions].reverse();
+        const labels = ordered.map((_, i) => `S${i + 1}`);
+
+        document.getElementById('chartCard').style.display = 'block';
+        makeChart('fillersChart', labels, ordered.map(s => s.fillers_per_minute), '#dc3545');
+        makeChart('wpmChart',     labels, ordered.map(s => s.wpm),               '#0066cc');
+        makeChart('eyeChart',     labels, ordered.map(s => s.eye_contact_pct),   '#28a745');
     }
 
     loadSessions();
