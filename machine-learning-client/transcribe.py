@@ -1,4 +1,5 @@
 """Generate a transcript from a video using Whisper."""
+
 import os
 import whisper
 from moviepy import VideoFileClip

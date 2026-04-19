@@ -1,10 +1,12 @@
-"""Tests for video transcription with Whisper mocked"""
+"""Tests for video transcription. Whisper and moviepy are mocked."""
+
 from unittest.mock import patch, MagicMock
 import transcribe
 
 
 @patch("transcribe.VideoFileClip")
 def test_extract_audio(mock_clip):
+    """extract_audio writes the audio track and closes the clip."""
     mock_video = MagicMock()
     mock_clip.return_value = mock_video
 
@@ -19,7 +21,8 @@ def test_extract_audio(mock_clip):
 @patch("transcribe.os.path.exists", return_value=True)
 @patch("transcribe.whisper.load_model")
 @patch("transcribe.extract_audio", return_value="temp_audio.wav")
-def test_transcribe_video(mock_extract, mock_load, mock_exists, mock_remove):
+def test_transcribe_video(mock_extract, mock_load, _mock_exists, mock_remove):
+    """transcribe_video returns the model's text and cleans up the temp file."""
     mock_model = MagicMock()
     mock_model.transcribe.return_value = {"text": "um hello world"}
     mock_load.return_value = mock_model

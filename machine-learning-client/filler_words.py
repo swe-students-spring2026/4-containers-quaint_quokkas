@@ -1,6 +1,6 @@
 """Rate a transcript based on filler-word usage."""
-import re
 
+import re
 
 # Weight reflects how strongly the word is a filler word.
 # "um"/"uh" are pretty much always fillers; "like"/"so" sometimes aren't
@@ -40,7 +40,9 @@ def rate_transcript(transcript):
     """Produce a filler-word report for a transcript."""
     counts = count_fillers(transcript)
     total_words = len(transcript.split())
-    weighted_score = sum(counts[f] * FILLER_WORDS[f] for f in counts)
+    weighted_score = sum(
+        count * FILLER_WORDS[filler] for filler, count in counts.items()
+    )
     rate = (weighted_score / total_words * 100) if total_words else 0.0
 
     if rate < 2:
