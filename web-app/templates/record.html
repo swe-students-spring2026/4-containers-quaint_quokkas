@@ -10,10 +10,11 @@
         <div>
             <h2>Camera preview</h2>
             <video id="videoPreview" playsinline autoplay muted></video>
+            <canvas id="frameCanvas" style="display: none;"></canvas>
         </div>
         <div>
             <h2>Recording</h2>
-            
+
             <div id="controls">
                 <button id="startBtn" onclick="startRecording()" style="width: 100%; padding: 1rem; font-size: 16px; background: #28a745;">
                     Start recording
@@ -46,19 +47,22 @@
     let mediaRecorder;
     let recordingStartTime;
     let recordingInterval;
+    let frameInterval;
     let stream;
     let frameBuffer = [];
     let videoChunks = [];
 
     const videoPreview = document.getElementById('videoPreview');
 
+    const canvas = document.getElementById('frameCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = 320;
+    canvas.height = 240;
+
     async function startRecording() {
         try {
             stream = await navigator.mediaDevices.getUserMedia({
-                video: {
-                    width: { ideal: 640 },
-                    height: { ideal: 480 }
-                },
+                video: { width: { ideal: 640 }, height: { ideal: 480 } },
                 audio: true
             });
 
@@ -66,12 +70,21 @@
 
             mediaRecorder = new MediaRecorder(stream);
             videoChunks = [];
+            frameBuffer = [];
 
             mediaRecorder.ondataavailable = (event) => {
                 videoChunks.push(event.data);
             };
 
             mediaRecorder.start();
+
+            // Capture one JPEG frame per second for facial analysis (capped at 60)
+            frameInterval = setInterval(() => {
+                if (frameBuffer.length < 60) {
+                    ctx.drawImage(videoPreview, 0, 0, 320, 240);
+                    frameBuffer.push(canvas.toDataURL('image/jpeg', 0.5));
+                }
+            }, 1000);
 
             recordingStartTime = Date.now();
             recordingInterval = setInterval(updateTime, 100);
@@ -94,6 +107,7 @@
         return new Promise((resolve) => {
             mediaRecorder.onstop = async () => {
                 clearInterval(recordingInterval);
+                clearInterval(frameInterval);
                 stream.getTracks().forEach(track => track.stop());
 
                 document.getElementById('recordingStatus').style.display = 'none';
@@ -119,12 +133,12 @@
             speechFormData.append('audio', audioBlob, 'audio.webm');
             speechFormData.append('session_id', sessionId);
 
-            const speechAnalysis = await fetchAPI('/api/analyze/speech', {
+            await fetchAPI('/api/analyze/speech', {
                 method: 'POST',
                 body: speechFormData
             });
 
-            const facialAnalysis = await fetchAPI('/api/analyze/facial', {
+            await fetchAPI('/api/analyze/facial', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

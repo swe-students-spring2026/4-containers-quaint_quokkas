@@ -8,11 +8,11 @@
 </div>
 
 <h1 id="sessionTitle">Session Results</h1>
-<p id="sessionDate" style="color: #999;">Loading...</p>
+<p id="sessionDate" style="color: #999; margin-top: -0.5rem;">Loading...</p>
 
 <div class="card">
     <h2>Summary</h2>
-    <div>
+    <div class="stat-grid">
         <div class="stat">
             <div class="stat-label">Duration</div>
             <div class="stat-value" id="metricDuration">-</div>
@@ -30,7 +30,7 @@
 
 <div class="card">
     <h2>Filler words</h2>
-    <div>
+    <div class="stat-grid">
         <div class="stat">
             <div class="stat-label">Total fillers</div>
             <div class="stat-value" id="metricFillerTotal">-</div>
@@ -48,7 +48,7 @@
 
 <div class="card">
     <h2>Eye contact & expression</h2>
-    <div>
+    <div class="stat-grid">
         <div class="stat">
             <div class="stat-label">Eye contact</div>
             <div class="stat-value" id="metricEyeContact">-</div>
@@ -70,7 +70,7 @@
 
 <div class="card">
     <h2>Pauses</h2>
-    <div>
+    <div class="stat-grid">
         <div class="stat">
             <div class="stat-label">Long pauses (&gt;1.5s)</div>
             <div class="stat-value" id="metricLongPauses">-</div>
@@ -107,10 +107,7 @@
     function renderSession(data) {
         document.getElementById('sessionTitle').textContent = data.title;
         document.getElementById('sessionDate').textContent = new Date(data.created_at).toLocaleDateString('en-US', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
+            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
         });
 
         // Summary
@@ -124,6 +121,7 @@
 
         // Filler breakdown
         const breakdownHTML = Object.entries(data.fillers_breakdown)
+            .sort((a, b) => b[1] - a[1])
             .map(([word, count]) => `
                 <div style="margin-bottom: 0.5rem;">
                     <strong>"${word}"</strong>: ${count} ${count === 1 ? 'time' : 'times'}

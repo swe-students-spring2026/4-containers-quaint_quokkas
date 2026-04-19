@@ -5,13 +5,16 @@ name = "pypi"
 
 [packages]
 flask = "*"
+pymongo = "*"
 
 [dev-packages]
 pytest = "*"
 pytest-cov = "*"
+pytest-flask = "*"
 pylint = "*"
 black = "*"
 tomli = "*"
+mongomock = "*"
 
 [requires]
 python_version = "3.10"
