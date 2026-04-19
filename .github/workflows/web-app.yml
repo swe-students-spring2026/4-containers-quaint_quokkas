@@ -1,4 +1,4 @@
-name: Build and Test
+name: Web App
 
 on:
   push:
@@ -9,10 +9,6 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        subdir: [web-app, machine-learning-client]
-
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python
@@ -21,15 +17,11 @@ jobs:
           python-version: "3.10"
       - name: Install dependencies
         run: |
-          cd ${{ matrix.subdir }}
+          cd web-app
           python -m pip install --upgrade pip
           python -m pip install pipenv
           pipenv install --dev --python $(which python)
       - name: Run tests with coverage
         run: |
-          cd ${{ matrix.subdir }}
-          if find . -name "test_*.py" | grep -q .; then
-            pipenv run pytest --cov
-          else
-            echo "No tests found, skipping"
-          fi
+          cd web-app
+          pipenv run pytest --cov

@@ -1,4 +1,5 @@
-![Build and Test](https://github.com/swe-students-spring2026/4-containers-quaint_quokkas/actions/workflows/full-stack.yml/badge.svg)                
+![Web App](https://github.com/swe-students-spring2026/4-containers-quaint_quokkas/actions/workflows/web-app.yml/badge.svg)
+![ML Client](https://github.com/swe-students-spring2026/4-containers-quaint_quokkas/actions/workflows/ml-client.yml/badge.svg)
 ![Lint](https://github.com/swe-students-spring2026/4-containers-quaint_quokkas/actions/workflows/lint.yml/badge.svg)
 
 # Presently
