@@ -13,6 +13,7 @@ import app as webapp
 def client():
     """Create a test client."""
     webapp.app.config["TESTING"] = True
+    webapp.app.config["LOGIN_DISABLED"] = True
     return webapp.app.test_client()
 
 
