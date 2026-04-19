@@ -1,17 +1,16 @@
 """Generate a transcript from a video using Whisper."""
 
 import os
-from moviepy import VideoFileClip
 
 
 def extract_audio(video_path, audio_path="temp_audio.wav"):
     """Pull the audio track out of a video file and write it to disk."""
-    video = VideoFileClip(video_path)
-    if video.audio is None:
-        video.close()
-        raise ValueError(f"No audio track found in {video_path}")
-    video.audio.write_audiofile(audio_path, logger=None)
-    video.close()
+    import subprocess                       
+    subprocess.run(                         
+        ["ffmpeg", "-y", "-i", video_path, "-vn", "-acodec", "pcm_s16le",                                                                                                                                       
+        "-ar", "16000", "-ac", "1", audio_path],
+        capture_output=True, check=True                                                                                                                                                                         
+    )                                                                            
     return audio_path
 
 
