@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Speech Practice Tool{% endblock %}
+
+{% block content %}
+<h1>Dashboard</h1>
+<p>Your past practice sessions</p>
+
+<div id="sessionsList">
+    <p>Loading sessions...</p>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    async function loadSessions() {
+        try {
+            const sessions = await fetchAPI('/api/sessions?user_id=demo_user');
+            renderSessions(sessions);
+        } catch (error) {
+            document.getElementById('sessionsList').innerHTML = '<p style="color: red;">Error loading sessions</p>';
+        }
+    }
+
+    function renderSessions(sessions) {
+        const html = sessions.map(session => `
+            <div class="session-item" onclick="window.location.href = '/session/${session.session_id}'">
+                <a href="/session/${session.session_id}" class="session-item-title">${session.title}</a>
+                <div class="session-item-date">${new Date(session.created_at).toLocaleDateString()}</div>
+                <div>
+                    <div class="stat">
+                        <div class="stat-label">Fillers per minute</div>
+                        <div class="stat-value">${session.fillers_per_minute}</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">Words per minute</div>
+                        <div class="stat-value">${session.wpm}</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">Eye contact</div>
+                        <div class="stat-value">${session.eye_contact_pct}%</div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+        
+        document.getElementById('sessionsList').innerHTML = html;
+    }
+
+    loadSessions();
+</script>
+{% endblock %}
