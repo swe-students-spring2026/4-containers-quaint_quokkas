@@ -4,17 +4,13 @@ from unittest.mock import patch, MagicMock
 import transcribe
 
 
-@patch("transcribe.VideoFileClip")
-def test_extract_audio(mock_clip):
-    """extract_audio writes the audio track and closes the clip."""
-    mock_video = MagicMock()
-    mock_clip.return_value = mock_video
-
+@patch("transcribe.subprocess.run")
+def test_extract_audio(mock_run):
+    """extract_audio calls ffmpeg and returns the audio path."""
     result = transcribe.extract_audio("fake.mp4", "out.wav")
 
     assert result == "out.wav"
-    mock_video.audio.write_audiofile.assert_called_once()
-    mock_video.close.assert_called_once()
+    mock_run.assert_called_once()
 
 
 @patch("transcribe.os.remove")
