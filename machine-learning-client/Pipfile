@@ -3,12 +3,20 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 name = "pypi"
 
+[[source]]
+url = "https://download.pytorch.org/whl/cpu"
+verify_ssl = true
+name = "pytorch-cpu"
+
 [packages]
 opencv-python-headless = "*"
 mediapipe = "*"
+torch = {version = "*", index = "pytorch-cpu"}
+torchaudio = {version = "*", index = "pytorch-cpu"}
 openai-whisper = "*"
 moviepy = "*"
 pymongo = "*"
+numpy = "*"
 
 [dev-packages]
 pylint = "*"

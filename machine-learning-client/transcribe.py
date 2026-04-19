@@ -1,7 +1,6 @@
 """Generate a transcript from a video using Whisper."""
 
 import os
-import whisper
 from moviepy import VideoFileClip
 
 
@@ -18,6 +17,8 @@ def extract_audio(video_path, audio_path="temp_audio.wav"):
 
 def transcribe_video(video_path, model_name="base"):
     """Transcribe the speech in a video and return the text."""
+    import whisper
+
     audio_path = extract_audio(video_path)
     try:
         model = whisper.load_model(model_name)
